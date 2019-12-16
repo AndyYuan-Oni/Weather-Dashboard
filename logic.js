@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var apiKey = "6ca57a58e237de03f61260dabc24269a";
-
+    var searchInput = "Sydney";
 
     //0K − 273.15 = -273.1°C
 
@@ -98,13 +98,48 @@ $(document).ready(function() {
         $(".fiveDay").empty();
     };
 
-    // function localSave(){
+    function localSave() {
+        localStorage.clear();
+        var childlength = $(".list-group").children().length;
+        for (i = 0; i < childlength; i++) {
+            var saveList = $($(".list-group").children()[i]).text();
 
-    // };
+            console.log(saveList);
 
-    // function localDisplay(){
+            var newInput = [{
+                "city": saveList,
+            }];
+            var cities = JSON.parse(localStorage.getItem("cities"));
 
-    // }
+            if (cities == null) {
+                cities = [newInput];
+                localStorage.setItem("cities", JSON.stringify(cities));
+            } else {
+                cities.push(newInput);
+                localStorage.setItem("cities", JSON.stringify(cities));
+            };
+        };
+    };
+
+    function localDisplay() {
+        if (display != null) {
+            $(".list-group").empty();
+            var display = JSON.parse(localStorage.getItem("cities"));
+
+            for (var i = 0; i < display.length; i++) {
+                var cityEl = display[i][0].city;
+                var liEl = $("<li class=\"list-group-item\">");
+                liEl.text(cityEl);
+                $(".list-group").append(liEl);
+            }
+        };
+
+
+    };
+
+    localDisplay();
+    currentResponse(searchInput);
+    fiveDayResponse(searchInput);
 
     $(".submitBtn").on("click", function() {
         event.preventDefault();
@@ -112,12 +147,16 @@ $(document).ready(function() {
         var searchInput = $("#searchInput").val(); //keyword
 
         $(".list-group").prepend("<li class=\"list-group-item\">" + searchInput + "</li>");
+
+        localSave();
+        localDisplay();
         clearAll();
         currentResponse(searchInput);
         fiveDayResponse(searchInput);
     });
 
-    $(".list-group-item").on("click", function() {
+    $("li").on("click", function() {
+        console.log("clicked");
         var searchInput = $(this).text();
         clearAll();
         currentResponse(searchInput);
